@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 
 if (isNaN(parseInt(process.argv[2]))) {
-  console.log('usage: node fxsnapshot.js <nb>');
+  console.log('usage: node fxsnapshot.js <count>');
   process.exit(1);
 }
 
@@ -46,7 +46,7 @@ const saveFrame = async (page, filename) => {
     console.log('PAGER ERROR:', err);
   });
 
-  let nb = parseInt(process.argv[2]);
+  let total = parseInt(process.argv[2]);
   let count = 1;
   page.on('console', async (msg) => {
     const text = msg.text();
@@ -57,7 +57,7 @@ const saveFrame = async (page, filename) => {
       const f = `images/${iteration}-${fxhash}.png`;
       console.log(f);
       await saveFrame(page, f);
-      if (count < nb) {
+      if (count < total) {
         count += 1;
         page.evaluate(() => {
           window.location = '/';
