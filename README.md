@@ -1,5 +1,5 @@
-fx(snapshot)
-============
+Fxsnapshot
+==========
 
 Install dependencies:
 ```
