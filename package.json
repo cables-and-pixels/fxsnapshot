@@ -1,0 +1,7 @@
+{
+  "name": "fxsnapshot",
+  "author": "Laurent Houdard - cables.and.pixels",
+  "dependencies": {
+    "puppeteer": "^13.4.0"
+  }
+}
