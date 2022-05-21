@@ -1,12 +1,14 @@
 Fxsnapshot
 ==========
 
+Capture a set of images from your local token.
+
 Install dependencies:
 ```
 npm install
 ```
 
-Generate *count* snapshots:
+Capture *count* images:
 ```
 node fxsnapshot.js <count>
 ```

@@ -53,7 +53,7 @@ const saveFrame = async (page, filename) => {
     let m = text.match(/TRIGGER PREVIEW/);
     if (m) {
       const fxhash = await page.evaluate(() => window.fxhash);
-      const iteration = String(count).padStart(3, '0');
+      const iteration = String(count).padStart(4, '0');
       const f = `images/${iteration}-${fxhash}.png`;
       console.log(f);
       await saveFrame(page, f);
