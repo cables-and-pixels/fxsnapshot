@@ -59,9 +59,7 @@ const saveFrame = async (page, filename) => {
       await saveFrame(page, f);
       if (count < total) {
         count += 1;
-        page.evaluate(() => {
-          window.location = '/';
-        });
+        await page.goto(url);
       }
       else {
         process.exit(0);
