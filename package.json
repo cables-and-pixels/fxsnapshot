@@ -4,7 +4,8 @@
   "license": "CC-BY-NC-4.0",
   "homepage": "https://github.com/cables-and-pixels/fxsnapshot",
   "dependencies": {
-    "puppeteer": "^13.4.0"
+    "puppeteer": "^13.4.0",
+    "yargs": "^17.6.0"
   },
   "devDependencies": {
     "eslint": "^8.9.0"
