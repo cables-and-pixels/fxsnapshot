@@ -22,6 +22,7 @@ const argv = require('yargs')
     width: 800,
     height: 800,
     timeout: 120,
+    captureViewport: false
   })
   .describe('url', 'Local token url')
   .help()
