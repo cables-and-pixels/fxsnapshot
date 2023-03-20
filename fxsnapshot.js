@@ -22,6 +22,7 @@ const argv = require('yargs')
     width: 800,
     height: 800,
     timeout: 120,
+    captureViewport: false
   })
   .describe('url', 'Local token url')
   .help()
@@ -39,14 +40,21 @@ const viewportSettings = {
 };
 
 const saveFrame = async (page, filename) => {
-  const base64 = await page.$eval('canvas', (el) => {
-    return el.toDataURL();
-  });
-  const pureBase64 = base64.replace(/^data:image\/png;base64,/, "");
-  const b = Buffer.from(pureBase64, "base64");
-  await fs.writeFile(filename, b, (err) => {
-    console.log(err ? err : filename);
-  });
+  if (argv.captureViewport) {
+    const capture = await page.screenshot()
+    await fs.writeFile(filename, capture, (err) => {
+      console.log(err ? err : filename);
+    });
+  } else {
+    const base64 = await page.$eval('canvas', (el) => {
+      return el.toDataURL();
+    });
+    const pureBase64 = base64.replace(/^data:image\/png;base64,/, "");
+    const b = Buffer.from(pureBase64, "base64");
+    await fs.writeFile(filename, b, (err) => {
+      console.log(err ? err : filename);
+    });
+  }
 };
 
 (async () => {
