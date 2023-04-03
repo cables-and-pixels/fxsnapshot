@@ -18,11 +18,11 @@ const argv = require('yargs')
       })
   })
   .default({
-    url: 'http://localhost:8080/',
+    url: 'http://localhost:3301/',
     width: 800,
     height: 800,
     timeout: 120,
-    captureViewport: false
+    captureViewport: false,
   })
   .describe('url', 'Local token url')
   .help()
@@ -57,6 +57,18 @@ const saveFrame = async (page, filename) => {
   }
 };
 
+const waitPreview = (page) => {
+  return new Promise(async (resolve) => {
+    page.evaluate(() => {
+      return new Promise((_resolve) => {
+        window.addEventListener('fxhash-preview', () => {
+          _resolve();
+        });
+      });
+    }).then(resolve);
+  });
+};
+
 (async () => {
 
   let browser = await puppeteer.launch({
@@ -83,26 +95,17 @@ const saveFrame = async (page, filename) => {
   });
 
   let total = parseInt(argv.count);
-  let count = 1;
-  page.on('console', async (msg) => {
-    const text = msg.text();
-    let m = text.match(/TRIGGER PREVIEW/);
-    if (m) {
-      const fxhash = await page.evaluate(() => window.fxhash);
-      const iteration = String(count).padStart(4, '0');
-      const f = `images/${iteration}-${fxhash}.png`;
-      console.log(f);
-      await saveFrame(page, f);
-      if (count < total) {
-        count += 1;
-        await page.goto(argv.url);
-      }
-      else {
-        process.exit(0);
-      }
-    }
-  });
 
-  await page.goto(argv.url);
+  for (let i = 1; i <= total; i++) {
+    await page.goto(argv.url);
+    await waitPreview(page);
+    const fxhash = await page.evaluate(() => window.$fx.hash);
+    const iteration = String(i).padStart(4, '0');
+    const f = `images/${iteration}-${fxhash}.png`;
+    console.log(f);
+    await saveFrame(page, f);
+  }
+
+  process.exit(0);
 
 })();

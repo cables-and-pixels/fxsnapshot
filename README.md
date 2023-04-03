@@ -18,10 +18,10 @@ Capture *count* images:
 node fxsnapshot.js <count>
 ```
 
-Use custom URL (http://localhost:8080/ by default):
+Use custom URL (http://localhost:3301/ by default):
 ```
 node fxsnapshot.js --url="file://..." <count>
 ```
 
 The script will work only if you use a canvas and call
-fxpreview(). Your token must be launched in parallel.
+$fx.preview(). Your token must be launched in parallel.
