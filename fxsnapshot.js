@@ -72,10 +72,8 @@ const waitPreview = (page) => {
 (async () => {
 
   let browser = await puppeteer.launch({
+    headless: 'new',
     ignoreHTTPSErrors: true,
-    args: [
-      '--use-gl=swiftshader',
-    ],
   });
 
   if (!browser) {
