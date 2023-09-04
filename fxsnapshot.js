@@ -39,7 +39,12 @@ const viewportSettings = {
   height: argv.height,
 };
 
-const saveFrame = async (page, filename) => {
+const saveFrame = async (page, i) => {
+  const fxhash = await page.evaluate(() => fxhash);
+  const iteration = String(i).padStart(4, '0');
+  const filename = `images/${iteration}-${fxhash}.png`;
+  console.log(filename);
+
   if (argv.captureViewport) {
     const capture = await page.screenshot()
     await fs.writeFile(filename, capture, (err) => {
@@ -57,25 +62,12 @@ const saveFrame = async (page, filename) => {
   }
 };
 
-const waitPreview = (page) => {
-  return new Promise(async (resolve) => {
-    page.evaluate(() => {
-      return new Promise((_resolve) => {
-        window.addEventListener('fxhash-preview', () => {
-          _resolve();
-        });
-      });
-    }).then(resolve);
-  });
-};
-
 (async () => {
 
   let browser = await puppeteer.launch({
     headless: 'new',
     ignoreHTTPSErrors: true,
   });
-
   if (!browser) {
     process.exit(1);
   }
@@ -83,27 +75,40 @@ const waitPreview = (page) => {
   let page = await browser.newPage();
   await page.setViewport(viewportSettings);
   await page.setDefaultNavigationTimeout(argv.timeout * 1000);
-
   if (!page) {
     process.exit(1);
   }
 
   page.on('error', (err) => {
-    console.log('PAGER ERROR:', err);
+    console.log('PAGE ERROR:', err);
+  });
+
+  await page.evaluateOnNewDocument(() => {
+    window.addEventListener('fxhash-preview', () => {
+      console.log('FXPREVIEW');
+    });
   });
 
   let total = parseInt(argv.count);
+  let i = 1;
+  let working = false;
 
-  for (let i = 1; i <= total; i++) {
-    await page.goto(argv.url);
-    await waitPreview(page);
-    const fxhash = await page.evaluate(() => window.$fx.hash);
-    const iteration = String(i).padStart(4, '0');
-    const f = `images/${iteration}-${fxhash}.png`;
-    console.log(f);
-    await saveFrame(page, f);
-  }
+  page.on('console', async (msg) => {
+    if (working) { return; }
+    working = true;
+    if (msg.text().match(/PREVIEW/)) {
+      await saveFrame(page, i);
+      if (i < total) {
+        i += 1;
+        page.goto(argv.url);
+      }
+      else {
+        process.exit(0);
+      }
+    }
+    working = false;
+  });
 
-  process.exit(0);
+  page.goto(argv.url);
 
 })();
